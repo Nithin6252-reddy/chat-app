@@ -1,12 +1,17 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const { chats } = require("./data/data");
+// const { chats } = require("./data/data");
 const connectDB = require("./config/db");
+const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 
 const app = express();
 dotenv.config();
 connectDB();
+
+app.use(express.json());
 
 const cors=require("cors");
 const corsOptions ={
@@ -17,21 +22,17 @@ const corsOptions ={
 
 app.use(cors(corsOptions)) // Use this after the variable declaration
 
-app.get('/', (req, res) => {
-    res.send("API is runninggggg");
+// app.get('/', (req, res) => {
+//     res.send("API is runninggggg");
 
-});
+// });
 
-app.get('/api/chat', (req, res) => {
-    res.send(chats);
+app.use("/api/user", userRoutes);
+app.use("/api/chat", chatRoutes);
 
-});
-
-app.get('/api/chat/:id', (req, res) => {
-    // console.log(req);
-    const singleChat = chats.find((c) => c._id === req.params.id);
-    res.send(singleChat);
-});
+// Error Handling middlewares
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000
 
